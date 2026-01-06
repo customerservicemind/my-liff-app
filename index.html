@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My GitHub LIFF</title>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding-top: 50px; }
+        img { border-radius: 50%; width: 100px; }
+        button { padding: 10px 20px; background: #00b900; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div id="profile">
+        <img id="pictureUrl" src="" alt="Profile Picture" style="display:none;">
+        <h1 id="displayName">กำลังโหลด...</h1>
+    </div>
+    <button id="btnSend">ส่งข้อความทักทาย</button>
+
+    <script>
+        async function main() {
+            // *** สำคัญ: เดี๋ยวเราจะเอา LIFF ID มาใส่ตรงนี้ ***
+            await liff.init({ liffId: "ใส่_LIFF_ID_ของคุณที่นี่" });
+
+            if (liff.isLoggedIn()) {
+                const profile = await liff.getProfile();
+                document.getElementById("displayName").innerText = "สวัสดีคุณ " + profile.displayName;
+                document.getElementById("pictureUrl").src = profile.pictureUrl;
+                document.getElementById("pictureUrl").style.display = "inline-block";
+            } else {
+                liff.login();
+            }
+        }
+
+        // ฟังก์ชันส่งข้อความ
+        document.getElementById("btnSend").onclick = async function() {
+            await liff.sendMessages([{
+                type: 'text',
+                text: 'สวัสดีจาก LIFF บน GitHub!'
+            }]);
+            alert("ส่งข้อความแล้ว!");
+        }
+
+        main();
+    </script>
+</body>
+</html>
