@@ -23,19 +23,24 @@
         .btn-save { background: #00b900; color: white; box-shadow: 0 4px 12px rgba(0,185,0,0.3); }
         .btn-save:active { transform: scale(0.98); }
         .btn-close { background: #fff; color: #ff4757; border: 1px solid #ff4757; }
-        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: none; justify-content: center; align-items: center; z-index: 99; }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: none; justify-content: center; align-items: center; z-index: 99; flex-direction: column; }
+        .loader { border: 5px solid #f3f3f3; border-top: 5px solid #00b900; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 10px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <div id="loading" class="loading-overlay">กำลังบันทึกข้อมูล...</div>
+    <div id="loading" class="loading-overlay">
+        <div class="loader"></div>
+        <div id="loadingText">กำลังโหลดข้อมูล...</div>
+    </div>
 
     <div class="card">
         <div class="header">DIGITAL MEMBER CARD</div>
         
         <div class="profile-section">
             <img id="pictureUrl" src="" alt="Profile">
-            <div id="displayName" class="user-name">กำลังโหลดข้อมูล...</div>
+            <div id="displayName" class="user-name">กำลังโหลดโปรไฟล์...</div>
             <div id="userId" class="user-id"></div>
         </div>
 
@@ -43,21 +48,21 @@
             <label for="phone">เบอร์โทรศัพท์มือถือ</label>
             <input type="tel" id="phone" placeholder="08XXXXXXXX" maxlength="10">
             
-            <button class="btn-save" onclick="saveData()">ลงทะเบียนสมาชิก</button>
+            <button id="mainBtn" class="btn-save" onclick="saveData()">ลงทะเบียนสมาชิก</button>
             <button class="btn-close" onclick="liff.closeWindow()">ยกเลิก</button>
         </div>
     </div>
 
     <script>
-        // --- ส่วนที่ 1: ตั้งค่าเริ่มต้น ---
-        const MY_LIFF_ID = "2008820291-s6WNZ5xr"; // ใส่ LIFF ID ของคุณ
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzL1du86DLbJMnLPTVvZ7oPK-6ci2K71LuVym9xPqaxAh-GBqSlcq-fUK4-3MQitpOokg/exec"; // ใส่ URL จาก Google Apps Script
+        // --- 1. ตั้งค่าไอดีต่างๆ ---
+        const MY_LIFF_ID = "2008820291-s6WNZ5xr"; 
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyZkm2BVzyFbmdqXWfhgQayyUxLUkXFq6C-d1ze47J8WeNSGmPQUjgQIgFgT4EdQ1PZVw/exec"; 
 
         async function main() {
             try {
                 await liff.init({ liffId: MY_LIFF_ID });
                 if (liff.isLoggedIn()) {
-                    getUserProfile();
+                    await getUserProfile();
                 } else {
                     liff.login();
                 }
@@ -67,34 +72,36 @@
         }
 
         async function getUserProfile() {
-    const profile = await liff.getProfile();
-    document.getElementById("displayName").innerText = profile.displayName;
-    document.getElementById("userId").innerText = "Line ID: " + profile.userId;
-    if (profile.pictureUrl) {
-        document.getElementById("pictureUrl").src = profile.pictureUrl;
-        document.getElementById("pictureUrl").style.display = "block";
-    }
+            const profile = await liff.getProfile();
+            document.getElementById("displayName").innerText = profile.displayName;
+            document.getElementById("userId").innerText = "Line ID: " + profile.userId;
+            if (profile.pictureUrl) {
+                document.getElementById("pictureUrl").src = profile.pictureUrl;
+                document.getElementById("pictureUrl").style.display = "block";
+            }
 
-    // --- ส่วนที่เพิ่มใหม่: ดึงข้อมูลจาก Google Sheets มาโชว์ ---
-    try {
-        const response = await fetch(`${GOOGLE_SCRIPT_URL}?userId=${profile.userId}`);
-        const result = await response.json();
-
-        if (result.status === "found") {
-            // ถ้าเจอข้อมูล ให้เอาเบอร์โทรไปใส่ในช่อง input
-            document.getElementById("phone").value = result.phone;
-            // และเปลี่ยนข้อความปุ่มให้รู้ว่าบันทึกไปแล้ว
-            document.querySelector(".btn-save").innerText = "อัปเดตข้อมูลสมาชิก";
-            
-            // แสดงข้อความทักทายเพิ่ม (ถ้าต้องการ)
-            document.getElementById("displayName").innerText += " (สมาชิกเก่า)";
+            // --- ดึงข้อมูลเก่าจาก Google Sheets ---
+            checkExistingMember(profile.userId);
         }
-    } catch (error) {
-        console.log("ยังไม่มีข้อมูลในระบบ");
-    }
-}
 
-        // --- ส่วนที่ 2: การบันทึกข้อมูล ---
+        async function checkExistingMember(userId) {
+            document.getElementById("loading").style.display = "flex";
+            try {
+                const response = await fetch(`${GOOGLE_SCRIPT_URL}?userId=${userId}`);
+                const result = await response.json();
+
+                if (result.status === "found") {
+                    document.getElementById("phone").value = result.phone;
+                    document.getElementById("mainBtn").innerText = "อัปเดตข้อมูลสมาชิก";
+                    document.getElementById("displayName").innerText += " (สมาชิก)";
+                }
+            } catch (error) {
+                console.log("ยังไม่มีข้อมูลสมาชิกเดิม");
+            } finally {
+                document.getElementById("loading").style.display = "none";
+            }
+        }
+
         async function saveData() {
             const phone = document.getElementById("phone").value;
             const profile = await liff.getProfile();
@@ -104,13 +111,14 @@
                 return;
             }
 
+            document.getElementById("loadingText").innerText = "กำลังบันทึกข้อมูล...";
             document.getElementById("loading").style.display = "flex";
 
             try {
-                // 1. ส่งเข้า Google Sheets
+                // ส่งข้อมูลไป Google Sheets
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // สำคัญ: เพื่อไม่ให้ติดเรื่อง CORS
+                    mode: 'no-cors', 
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         userId: profile.userId,
@@ -119,22 +127,22 @@
                     })
                 });
 
-                // 2. ส่งข้อความยืนยันใน LINE แชท
+                // ส่ง Flex Message หรือ Text ยืนยัน
                 if (liff.isInClient()) {
                     await liff.sendMessages([
                         {
                             "type": "text",
-                            "text": "✅ ลงทะเบียนสำเร็จ!\nชื่อ: " + profile.displayName + "\nเบอร์โทร: " + phone
+                            "text": "✅ บันทึกข้อมูลเรียบร้อย!\nชื่อ: " + profile.displayName + "\nเบอร์โทร: " + phone
                         }
                     ]);
                 }
 
-                alert("ลงทะเบียนสมาชิกเรียบร้อยแล้ว!");
+                alert("บันทึกข้อมูลเรียบร้อยแล้ว!");
                 liff.closeWindow();
 
             } catch (error) {
                 console.error("Error:", error);
-                alert("เกิดข้อผิดพลาด กรุณาลองใหม่");
+                alert("เกิดข้อผิดพลาดในการบันทึก");
             } finally {
                 document.getElementById("loading").style.display = "none";
             }
