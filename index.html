@@ -1,30 +1,37 @@
-HTML
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Member Card System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    
     <style>
-        body { font-family: 'Kanit', sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .card { background: white; width: 100%; max-width: 350px; border-radius: 15px; shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .header { background: #00b900; color: white; padding: 20px; text-align: center; font-weight: bold; }
-        .profile-section { text-align: center; padding: 20px; }
-        #pictureUrl { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #00b900; display: none; margin: 0 auto 10px; }
-        .user-name { font-size: 1.2rem; font-weight: bold; color: #333; }
-        .user-id { font-size: 0.7rem; color: #999; word-break: break-all; margin-top: 5px; padding: 0 20px; }
-        .form-section { padding: 20px; border-top: 1px solid #eee; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .btn-save { background: #00b900; color: white; margin-bottom: 10px; }
-        .btn-close { background: #ee5253; color: white; }
+        body { font-family: 'Kanit', sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .card { background: white; width: 100%; max-width: 380px; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #00b900 0%, #009900 100%); color: white; padding: 25px; text-align: center; font-size: 1.4rem; font-weight: bold; }
+        .profile-section { text-align: center; padding: 30px 20px; background: #fff; }
+        #pictureUrl { width: 100px; height: 100px; border-radius: 50%; border: 4px solid #f0f2f5; margin-bottom: 15px; display: none; margin-left: auto; margin-right: auto; }
+        .user-name { font-size: 1.3rem; font-weight: bold; color: #333; margin: 5px 0; }
+        .user-id { font-size: 0.75rem; color: #999; margin-bottom: 20px; }
+        .form-section { padding: 0 25px 30px; }
+        label { display: block; margin-bottom: 8px; font-size: 0.9rem; color: #666; }
+        input { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 10px; font-size: 1rem; box-sizing: border-box; outline: none; transition: border 0.3s; }
+        input:focus { border-color: #00b900; }
+        button { width: 100%; padding: 14px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: 0.3s; margin-bottom: 12px; }
+        .btn-save { background: #00b900; color: white; box-shadow: 0 4px 12px rgba(0,185,0,0.3); }
+        .btn-save:active { transform: scale(0.98); }
+        .btn-close { background: #fff; color: #ff4757; border: 1px solid #ff4757; }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: none; justify-content: center; align-items: center; z-index: 99; }
     </style>
 </head>
 <body>
 
+    <div id="loading" class="loading-overlay">กำลังบันทึกข้อมูล...</div>
+
     <div class="card">
-        <div class="header">บัตรสมาชิกออนไลน์</div>
+        <div class="header">DIGITAL MEMBER CARD</div>
         
         <div class="profile-section">
             <img id="pictureUrl" src="" alt="Profile">
@@ -33,79 +40,89 @@ HTML
         </div>
 
         <div class="form-section">
-            <label for="phone">เบอร์โทรศัพท์:</label>
-            <input type="tel" id="phone" placeholder="08XXXXXXXX">
-            <button class="btn-save" onclick="saveData()">บันทึกข้อมูลสมาชิก</button>
-            <button class="btn-close" onclick="liff.closeWindow()">ปิดหน้าต่าง</button>
+            <label for="phone">เบอร์โทรศัพท์มือถือ</label>
+            <input type="tel" id="phone" placeholder="08XXXXXXXX" maxlength="10">
+            
+            <button class="btn-save" onclick="saveData()">ลงทะเบียนสมาชิก</button>
+            <button class="btn-close" onclick="liff.closeWindow()">ยกเลิก</button>
         </div>
     </div>
 
     <script>
+        // --- ส่วนที่ 1: ตั้งค่าเริ่มต้น ---
+        const MY_LIFF_ID = "2008820291-s6WNZ5xr"; // ใส่ LIFF ID ของคุณ
+        const GOOGLE_SCRIPT_URL = "https://docs.google.com/spreadsheets/d/1TNk0jAsFNLddlRLpH57Sg3gwE0xPofjDDACuwnimBpE/edit?usp=sharing"; // ใส่ URL จาก Google Apps Script
+
         async function main() {
             try {
-                // *** สำคัญ: เปลี่ยนไอดีตรงนี้เป็นของคุณ ***
-                await liff.init({ liffId: "2008820291-s6WNZ5xr" });
-
+                await liff.init({ liffId: MY_LIFF_ID });
                 if (liff.isLoggedIn()) {
                     getUserProfile();
                 } else {
                     liff.login();
                 }
-            } catch (error) {
-                console.error("LIFF Init Error:", error);
+            } catch (err) {
+                console.error("LIFF Error:", err);
             }
         }
 
         async function getUserProfile() {
             const profile = await liff.getProfile();
             document.getElementById("displayName").innerText = profile.displayName;
-            document.getElementById("userId").innerText = "ID: " + profile.userId;
+            document.getElementById("userId").innerText = "Line ID: " + profile.userId;
             if (profile.pictureUrl) {
                 document.getElementById("pictureUrl").src = profile.pictureUrl;
                 document.getElementById("pictureUrl").style.display = "block";
             }
         }
 
-        function saveData() {
+        // --- ส่วนที่ 2: การบันทึกข้อมูล ---
         async function saveData() {
-    const phone = document.getElementById("phone").value;
-    const name = document.getElementById("displayName").innerText;
-    const userId = liff.getContext().userId; // ดึง UserId จาก LIFF
-    
-    if (phone.length < 10) {
-        alert("กรุณากรอกเบอร์โทรให้ถูกต้อง");
-        return;
-    }
+            const phone = document.getElementById("phone").value;
+            const profile = await liff.getProfile();
 
-    // URL ของ Google Apps Script ที่คุณก๊อปปี้มา
-    const scriptUrl = "https://docs.google.com/spreadsheets/d/1TNk0jAsFNLddlRLpH57Sg3gwE0xPofjDDACuwnimBpE/edit?usp=sharing";
+            if (phone.length < 10) {
+                alert("กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก");
+                return;
+            }
 
-    try {
-        // 1. ส่งข้อมูลไปที่ Google Sheets
-        await fetch(scriptUrl, {
-            method: 'POST',
-            body: JSON.stringify({
-                userId: userId,
-                name: name,
-                phone: phone
-            })
-        });
+            document.getElementById("loading").style.display = "flex";
 
-        // 2. ถ้าส่งสำเร็จ ให้ส่ง Flex Message บอกผู้ใช้ (โค้ดเดิมที่คุณมี)
-        if (liff.isInClient()) {
-            await liff.sendMessages([{
-                "type": "text",
-                "text": "บันทึกข้อมูลสมาชิกของคุณเรียบร้อยแล้ว!"
-            }]);
-            alert("บันทึกลง Google Sheets สำเร็จ!");
-            liff.closeWindow();
+            try {
+                // 1. ส่งเข้า Google Sheets
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // สำคัญ: เพื่อไม่ให้ติดเรื่อง CORS
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: profile.userId,
+                        name: profile.displayName,
+                        phone: phone
+                    })
+                });
+
+                // 2. ส่งข้อความยืนยันใน LINE แชท
+                if (liff.isInClient()) {
+                    await liff.sendMessages([
+                        {
+                            "type": "text",
+                            "text": "✅ ลงทะเบียนสำเร็จ!\nชื่อ: " + profile.displayName + "\nเบอร์โทร: " + phone
+                        }
+                    ]);
+                }
+
+                alert("ลงทะเบียนสมาชิกเรียบร้อยแล้ว!");
+                liff.closeWindow();
+
+            } catch (error) {
+                console.error("Error:", error);
+                alert("เกิดข้อผิดพลาด กรุณาลองใหม่");
+            } finally {
+                document.getElementById("loading").style.display = "none";
+            }
         }
-        
-    } catch (error) {
-        console.error("Error!", error);
-        alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
-    }
-}
+
+        main();
     </script>
 </body>
 </html>
