@@ -3,73 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My LIFF App</title>
+    <title>Member Card</title>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 20px; }
-        img { border-radius: 50%; width: 100px; margin-bottom: 10px; }
-        button { 
-            display: block; width: 100%; padding: 15px; margin: 10px 0; 
-            border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer;
-        }
-        .btn-msg { background-color: #28a745; }
-        .btn-flex { background-color: #007bff; }
+        body { font-family: 'Helvetica', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; padding-top: 50px; }
+        .card { background: white; width: 85%; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); overflow: hidden; text-align: center; padding-bottom: 30px; }
+        .header { background: #00b900; height: 100px; }
+        .profile-img { width: 100px; height: 100px; border-radius: 50%; border: 5px solid white; margin-top: -50px; background: #eee; }
+        .info { padding: 20px; }
+        .name { font-size: 22px; font-weight: bold; color: #333; }
+        .status { color: #888; font-size: 14px; margin-top: 5px; }
+        .user-id { background: #f8f9fa; margin: 20px; padding: 10px; border-radius: 10px; font-family: monospace; font-size: 12px; color: #666; word-break: break-all; }
+        .btn-close { background: #ff4b5c; color: white; border: none; padding: 10px 25px; border-radius: 25px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
-    <img id="pictureUrl" src="" style="display:none;">
-    <h1 id="displayName">สากำลังเทสจ้า...</h1>
 
-    <button class="btn-msg" id="btnMsg">ส่งข้อความธรรมดา</button>
-    <button class="btn-flex" id="btnFlex">ส่ง Flex Message</button>
+<div class="card">
+    <div class="header"></div>
+    <img id="pictureUrl" class="profile-img" src="https://via.placeholder.com/100" alt="Profile">
+    <div class="info">
+        <div id="displayName" class="name">กำลังโหลด...</div>
+        <div id="statusMessage" class="status">-</div>
+        <div id="userId" class="user-id">ID: ...</div>
+        <button class="btn-close" onclick="liff.closeWindow()">ปิดหน้าต่าง</button>
+    </div>
+</div>
 
-    <script>
-        async function main() {
-            // *** อย่าลืมเปลี่ยนตรงนี้เป็น LIFF ID ของคุณ ***
-            await liff.init({ liffId: "2008820291-s6WNZ5xr" });
+<script>
+    async function main() {
+        await liff.init({ liffId: "ใส่_LIFF_ID_ของคุณที่นี่" });
 
-            if (liff.isLoggedIn()) {
-                const profile = await liff.getProfile();
-                document.getElementById("displayName").innerText = profile.displayName;
-                document.getElementById("pictureUrl").src = profile.pictureUrl;
-                document.getElementById("pictureUrl").style.display = "inline-block";
-            } else {
-                liff.login();
-            }
+        if (liff.isLoggedIn()) {
+            const profile = await liff.getProfile();
+            
+            // นำข้อมูลมาโชว์บนหน้าเว็บ
+            document.getElementById("displayName").innerText = profile.displayName;
+            document.getElementById("pictureUrl").src = profile.pictureUrl;
+            document.getElementById("statusMessage").innerText = profile.statusMessage || "ไม่มีสถานะ";
+            document.getElementById("userId").innerText = "User ID: " + profile.userId;
+
+        } else {
+            liff.login();
         }
+    }
+    main();
+</script>
 
-        // ฟังก์ชันส่งข้อความธรรมดา
-        document.getElementById("btnMsg").onclick = async function() {
-            if (liff.isInClient()) {
-                await liff.sendMessages([{ type: 'text', text: 'ทักทายตอนเช้าครับ!' }]);
-                liff.closeWindow();
-            }
-        }
-
-        // ฟังก์ชันส่ง Flex Message
-        document.getElementById("btnFlex").onclick = async function() {
-            if (liff.isInClient()) {
-                await liff.sendMessages([{
-                    "type": "flex",
-                    "altText": "คุณได้รับบัตรทักทาย",
-                    "contents": {
-                        "type": "bubble",
-                        "body": {
-                            "type": "box",
-                            "layout": "vertical",
-                            "contents": [
-                                { "type": "text", "text": "Greeting Card", "weight": "bold", "color": "#1DB446", "size": "sm" },
-                                { "type": "text", "text": "ยินดีที่ได้รู้จัก!", "weight": "bold", "size": "xl", "margin": "md" },
-                                { "type": "text", "text": "ส่งจากระบบ LIFF ของฉันเอง", "size": "xs", "color": "#aaaaaa", "wrap": true }
-                            ]
-                        }
-                    }
-                }]);
-                liff.closeWindow();
-            }
-        }
-
-        main();
-    </script>
 </body>
 </html>
