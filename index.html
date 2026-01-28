@@ -1,23 +1,81 @@
+HTML
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>My LIFF</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Card System</title>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        body { font-family: 'Kanit', sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .card { background: white; width: 100%; max-width: 350px; border-radius: 15px; shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .header { background: #00b900; color: white; padding: 20px; text-align: center; font-weight: bold; }
+        .profile-section { text-align: center; padding: 20px; }
+        #pictureUrl { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #00b900; display: none; margin: 0 auto 10px; }
+        .user-name { font-size: 1.2rem; font-weight: bold; color: #333; }
+        .user-id { font-size: 0.7rem; color: #999; word-break: break-all; margin-top: 5px; padding: 0 20px; }
+        .form-section { padding: 20px; border-top: 1px solid #eee; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-save { background: #00b900; color: white; margin-bottom: 10px; }
+        .btn-close { background: #ee5253; color: white; }
+    </style>
 </head>
 <body>
-    <h1 id="displayName">กำลังโหลด...</h1>
+
+    <div class="card">
+        <div class="header">บัตรสมาชิกออนไลน์</div>
+        
+        <div class="profile-section">
+            <img id="pictureUrl" src="" alt="Profile">
+            <div id="displayName" class="user-name">กำลังโหลดข้อมูล...</div>
+            <div id="userId" class="user-id"></div>
+        </div>
+
+        <div class="form-section">
+            <label for="phone">เบอร์โทรศัพท์:</label>
+            <input type="tel" id="phone" placeholder="08XXXXXXXX">
+            <button class="btn-save" onclick="saveData()">บันทึกข้อมูลสมาชิก</button>
+            <button class="btn-close" onclick="liff.closeWindow()">ปิดหน้าต่าง</button>
+        </div>
+    </div>
 
     <script>
-        // โค้ด JavaScript ทั้งหมดจะอยู่ระหว่างแท็ก <script> และ </script>
         async function main() {
-            await liff.init({ liffId: "ไอดีของคุณ" });
-            if (liff.isLoggedIn()) {
-                const profile = await liff.getProfile();
-                document.getElementById("displayName").innerText = profile.displayName;
-            } else {
-                liff.login();
+            try {
+                // *** สำคัญ: เปลี่ยนไอดีตรงนี้เป็นของคุณ ***
+                await liff.init({ liffId: "2008820291-s6WNZ5xr" });
+
+                if (liff.isLoggedIn()) {
+                    getUserProfile();
+                } else {
+                    liff.login();
+                }
+            } catch (error) {
+                console.error("LIFF Init Error:", error);
             }
         }
+
+        async function getUserProfile() {
+            const profile = await liff.getProfile();
+            document.getElementById("displayName").innerText = profile.displayName;
+            document.getElementById("userId").innerText = "ID: " + profile.userId;
+            if (profile.pictureUrl) {
+                document.getElementById("pictureUrl").src = profile.pictureUrl;
+                document.getElementById("pictureUrl").style.display = "block";
+            }
+        }
+
+        function saveData() {
+            const phone = document.getElementById("phone").value;
+            if (phone.length < 9) {
+                alert("กรุณากรอกเบอร์โทรให้ถูกต้อง");
+            } else {
+                alert("บันทึกเบอร์ " + phone + " สำเร็จ!");
+                // อนาคตส่งข้อมูลไป Google Sheets ตรงนี้ได้
+            }
+        }
+
         main();
     </script>
 </body>
