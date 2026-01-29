@@ -3,73 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Member Registration</title>
+    <title>VIP Member & Service</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
-        :root { --primary: #00b900; --bg: #f4f7f6; }
-        body { font-family: 'Kanit', sans-serif; background: var(--bg); margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .card { background: white; width: 100%; max-width: 400px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; }
-        .header { background: var(--primary); color: white; padding: 25px; text-align: center; font-size: 1.5rem; font-weight: bold; }
+        :root { --primary: #00b900; --secondary: #009900; --bg: #f8f9fa; }
+        body { font-family: 'Kanit', sans-serif; background-color: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .card { background: white; width: 100%; max-width: 400px; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 25px; text-align: center; font-size: 1.4rem; font-weight: bold; }
         .profile { text-align: center; padding: 20px; }
-        #pictureUrl { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--primary); margin: 0 auto 10px; display: none; }
-        .form { padding: 0 25px 25px; }
-        label { display: block; margin-top: 15px; font-size: 0.9rem; color: #666; }
-        input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-family: 'Kanit'; }
-        button { width: 100%; padding: 15px; margin-top: 20px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-family: 'Kanit'; font-size: 1rem; }
-        .btn-save { background: var(--primary); color: white; }
-        .btn-close { background: none; color: #ff4757; border: 1px solid #ff4757; margin-top: 10px; }
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
+        #pictureUrl { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin: 0 auto 10px; display: none; }
+        .form-section { padding: 0 25px 20px; }
+        label { display: block; margin-top: 12px; font-size: 0.85rem; color: #666; }
+        input { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-family: 'Kanit'; }
+        .btn-save { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: bold; margin-top: 20px; cursor: pointer; }
+        
+        /* Service Menu Style */
+        .service-menu { padding: 0 25px 30px; }
+        .service-title { font-size: 0.9rem; color: #888; margin: 20px 0 10px; border-top: 1px solid #eee; padding-top: 15px; text-align: center; }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn-service { background: #fff; border: 1px solid #eee; padding: 15px 10px; border-radius: 15px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: 0.3s; font-family: 'Kanit'; font-size: 0.8rem; }
+        .btn-service:active { background: #f0f0f0; transform: scale(0.95); }
+        .icon { font-size: 1.4rem; }
+        .loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
     </style>
 </head>
 <body>
 
-<div id="loading" class="overlay"><div>กำลังดำเนินการ...</div></div>
+<div id="loading" class="loading"><div>กำลังประมวลผล...</div></div>
 
 <div class="card">
-    <div class="header">VIP MEMBER</div>
+    <div class="header">VIP MEMBER CARD</div>
     <div class="profile">
         <img id="pictureUrl" src="">
-        <div id="displayName" style="font-weight:bold">Loading...</div>
+        <div id="displayName" style="font-weight:bold; color: #333;">Loading...</div>
     </div>
-    <div class="form">
-        <label>ชื่อ-นามสกุล</label>
-        <input type="text" id="fullName">
-        
-        <label>ชื่อบริษัท</label>
-        <input type="text" id="company">
-        
+
+    <div class="form-section">
+        <label>ชื่อ-นามสกุลจริง</label>
+        <input type="text" id="fullName" placeholder="กรอกชื่อของคุณ">
+        <label>ชื่อบริษัท / องค์กร</label>
+        <input type="text" id="company" placeholder="ระบุบริษัท">
         <label>อีเมล</label>
-        <input type="email" id="email">
-        
+        <input type="email" id="email" placeholder="example@mail.com">
         <label>เบอร์โทรศัพท์</label>
         <input type="tel" id="phone" maxlength="10">
         
-        <button id="mainBtn" class="btn-save" onclick="saveData()">บันทึกข้อมูล</button>
-        <button class="btn-close" onclick="liff.closeWindow()">ยกเลิก</button>
+        <button id="mainBtn" class="btn-save" onclick="saveData()">บันทึกข้อมูลสมาชิก</button>
+    </div>
+
+    <div class="service-menu">
+        <div class="service-title">เลือกบริการที่ต้องการ</div>
+        <div class="btn-grid">
+            <button class="btn-service" onclick="sendService('สอบถามข้อมูลบริการ')">
+                <span class="icon">ℹ️</span> สอบถามบริการ
+            </button>
+            <button class="btn-service" onclick="sendService('ติดต่อสอบถามสินค้า')">
+                <span class="icon">📦</span> สอบถามสินค้า
+            </button>
+            <button class="btn-service" style="grid-column: span 2;" onclick="sendService('แจ้งตรวจเช็คสภาพเครื่องจักร')">
+                <span class="icon">🛠️</span> แจ้งตรวจเช็คสภาพเครื่องจักร
+            </button>
+        </div>
     </div>
 </div>
 
 <script>
     const LIFF_ID = "2008820291-s6WNZ5xr"; 
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwZJedCJFZmGLtEwgSlxFLxKZfl0xPS0J3MQfN3LQAba7Xnp2FtH1kJbg0wlo6hkKjVwQ/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzS6szROYYocO5pyQi16gXiD-b6QH9rG_UV4ZEM72WyU0dtjXU46zsDGPzQx5aNQclVuw/exec"; 
 
     async function main() {
         await liff.init({ liffId: LIFF_ID });
-        if (!liff.isLoggedIn()) {
-            liff.login();
-        } else {
+        if (!liff.isLoggedIn()) { liff.login(); } 
+        else {
             const profile = await liff.getProfile();
             document.getElementById("displayName").innerText = profile.displayName;
             if (profile.pictureUrl) {
                 document.getElementById("pictureUrl").src = profile.pictureUrl;
                 document.getElementById("pictureUrl").style.display = "block";
             }
-            
-            // ดึง Email เริ่มต้น
             const token = liff.getDecodedIDToken();
             if (token && token.email) document.getElementById("email").value = token.email;
-
             loadOldData(profile.userId);
         }
     }
@@ -86,7 +100,7 @@
                 document.getElementById("phone").value = data.phone;
                 document.getElementById("mainBtn").innerText = "อัปเดตข้อมูลเดิม";
             }
-        } catch (e) { console.log("New User"); }
+        } catch (e) { }
         document.getElementById("loading").style.display = "none";
     }
 
@@ -101,26 +115,30 @@
             phone: document.getElementById("phone").value
         };
 
-        if (!payload.fullName || !payload.phone) return alert("กรุณากรอกข้อมูลสำคัญ");
+        if (!payload.fullName || !payload.company || payload.phone.length < 10) {
+            return alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+        }
 
         document.getElementById("loading").style.display = "flex";
-
-        // ส่งข้อมูลแบบ POST
-        fetch(SCRIPT_URL, {
-            method: "POST",
-            body: JSON.stringify(payload)
-        })
+        fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) })
         .then(() => {
-            alert("บันทึกสำเร็จ!");
+            alert("บันทึกข้อมูลสำเร็จ!");
             liff.closeWindow();
         })
-        .catch(err => {
-            console.error(err);
-            alert("บันทึกไม่สำเร็จ แต่ข้อมูลอาจจะเข้าแล้ว โปรดเช็คใน Sheets");
-        })
-        .finally(() => {
-            document.getElementById("loading").style.display = "none";
-        });
+        .catch(() => alert("เกิดข้อผิดพลาด"));
+    }
+
+    async function sendService(topic) {
+        if (!liff.isInClient()) return alert("กรุณาใช้ผ่าน LINE");
+        const name = document.getElementById("fullName").value || "ยังไม่ระบุชื่อ";
+        const company = document.getElementById("company").value || "-";
+        
+        await liff.sendMessages([{
+            "type": "text",
+            "text": `📌 บริการที่ต้องการ: ${topic}\n👤 ชื่อ: ${name}\n🏢 บริษัท: ${company}`
+        }]);
+        alert("ส่งคำขอเรียบร้อย เจ้าหน้าที่จะติดต่อกลับครับ");
+        liff.closeWindow();
     }
 
     main();
