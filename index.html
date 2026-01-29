@@ -1,137 +1,121 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIP Member & History</title>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
+    <title>Member Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400&display=swap" rel="stylesheet">
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
-        :root { --line-green: #00b900; --dark-card: #1a1a1a; --gold: #D4AF37; }
-        body { font-family: 'Kanit', sans-serif; background-color: #f0f2f5; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 400px; }
+        :root { --text: #333; --light-gray: #fdfdfd; --border: #eeeeee; --accent: #1a1a1a; }
+        body { font-family: 'Kanit', sans-serif; background: #ffffff; color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; -webkit-font-smoothing: antialiased; }
+        .container { width: 100%; max-width: 360px; }
         
-        /* บัตร VIP */
-        .vip-card { 
-            background: linear-gradient(135deg, #1a1a1a 0%, #333 100%); color: white; 
-            padding: 25px; border-radius: 20px; border: 1px solid var(--gold);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2); position: relative; margin-bottom: 20px;
-        }
-        .vip-label { color: var(--gold); font-size: 0.7rem; letter-spacing: 2px; font-weight: bold; }
-        .vip-name { font-size: 1.5rem; margin: 10px 0; font-weight: 700; }
-        .vip-detail { font-size: 0.9rem; opacity: 0.8; }
-        #userImg { position: absolute; right: 20px; top: 20px; width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--gold); }
+        /* Member Card Design: Simple & Clean */
+        .member-header { padding: 40px 0 20px 0; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
+        .label { font-size: 0.65rem; letter-spacing: 3px; text-transform: uppercase; color: #aaaaaa; font-weight: 400; }
+        .name { font-size: 1.8rem; font-weight: 400; margin: 8px 0; color: var(--accent); }
+        .company { font-size: 0.9rem; color: #888888; }
+        
+        /* Form Design */
+        .form-section { margin-top: 10px; }
+        .input-group { margin-bottom: 15px; }
+        input, textarea { width: 100%; padding: 12px 0; border: none; border-bottom: 1px solid var(--border); font-family: 'Kanit'; font-size: 1rem; color: var(--text); background: transparent; transition: border-color 0.3s; }
+        input:focus, textarea:focus { outline: none; border-bottom: 1px solid var(--accent); }
+        textarea { resize: none; margin-top: 10px; }
+        
+        .btn-submit { width: 100%; padding: 18px; background: var(--accent); color: #ffffff; border: none; border-radius: 2px; font-size: 0.9rem; font-weight: 400; cursor: pointer; margin-top: 30px; letter-spacing: 2px; transition: opacity 0.3s; }
+        .btn-submit:active { opacity: 0.8; }
+        
+        /* History Section */
+        .history-section { margin-top: 50px; }
+        .history-title { font-size: 0.7rem; color: #bbbbbb; letter-spacing: 2px; margin-bottom: 20px; }
+        .history-item { padding: 15px 0; border-bottom: 1px solid #fafafa; }
+        .h-date { font-size: 0.7rem; color: #cccccc; margin-bottom: 4px; }
+        .h-note { font-size: 0.85rem; color: #666666; line-height: 1.5; }
 
-        /* ส่วนฟอร์มและประวัติ */
-        .section { background: white; border-radius: 15px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        h3 { margin-top: 0; font-size: 1rem; color: #333; border-left: 4px solid var(--line-green); padding-left: 10px; }
-        
-        label { font-size: 0.8rem; color: #666; display: block; margin-top: 10px; }
-        input, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: 'Kanit'; }
-        
-        .btn-submit { width: 100%; padding: 15px; background: var(--line-green); color: white; border: none; border-radius: 10px; font-weight: bold; margin-top: 15px; cursor: pointer; font-size: 1rem; }
-        
-        /* ตารางประวัติ */
-        .history-box { max-height: 200px; overflow-y: auto; margin-top: 10px; }
-        .history-item { padding: 10px; border-bottom: 1px solid #eee; font-size: 0.85rem; }
-        .h-date { color: #999; font-size: 0.7rem; }
-        .h-note { color: #555; margin-top: 3px; }
-
-        .loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
+        /* Loading */
+        .loading { position: fixed; inset: 0; background: rgba(255,255,255,0.95); display: none; align-items: center; justify-content: center; z-index: 100; font-size: 0.8rem; letter-spacing: 2px; color: #999; }
     </style>
 </head>
 <body>
 
-<div id="loading" class="loading">
-    <div style="border: 4px solid #f3f3f3; border-top: 4px solid var(--line-green); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;"></div>
-    <p>กำลังดำเนินการ...</p>
-</div>
+<div id="loading" class="loading">SYNCING...</div>
 
 <div class="container">
-    <div class="vip-card">
-        <div class="vip-label">VIP MEMBER</div>
-        <div id="dispName" class="vip-name">รอกดบันทึกข้อมูล</div>
-        <div id="dispCompany" class="vip-detail">บริษัท: -</div>
-        <div id="dispPhone" class="vip-detail">โทร: -</div>
-        <img id="userImg" src="https://via.placeholder.com/60">
+    <div class="member-header">
+        <div class="label">Identity</div>
+        <div id="dispName" class="name">Guest</div>
+        <div id="dispCompany" class="company">Waiting for information...</div>
     </div>
 
-    <div class="section">
-        <h3>บันทึกข้อมูลและแจ้งบริการ</h3>
-        <label>ชื่อ-นามสกุล</label>
-        <input type="text" id="fullName" placeholder="ชื่อของคุณ">
-        <label>บริษัท</label>
-        <input type="text" id="company" placeholder="ชื่อบริษัท">
-        <label>เบอร์โทรศัพท์</label>
-        <input type="tel" id="phone" maxlength="10">
-        <label>โน้ต / รายละเอียด</label>
-        <textarea id="userNote" rows="2" placeholder="พิมพ์ข้อความที่ต้องการบันทึก..."></textarea>
+    <div class="form-section">
+        <input type="text" id="fullName" placeholder="Full Name">
+        <input type="text" id="company" placeholder="Company / Organization">
+        <input type="tel" id="phone" placeholder="Phone Number" maxlength="10">
+        <textarea id="userNote" rows="2" placeholder="Note / Service Detail"></textarea>
         
-        <button class="btn-submit" onclick="saveAllInOne()">บันทึกข้อมูลและแสดงประวัติ</button>
+        <button class="btn-submit" onclick="processRequest()">SAVE & REQUEST</button>
     </div>
 
-    <div class="section">
-        <h3>ประวัติย้อนหลัง</h3>
-        <div id="historyList" class="history-box">
-            <div style="text-align:center; color:#ccc; padding:20px;">ยังไม่มีประวัติการบันทึก</div>
+    <div class="history-section">
+        <div class="history-title">RECENT ACTIVITY</div>
+        <div id="historyList">
+            <div style="font-size: 0.8rem; color: #eee; padding: 10px 0;">No logs found</div>
         </div>
     </div>
 </div>
 
 <script>
-    const LIFF_ID = "2008820291-s6WNZ5xr"; 
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWeQ72gXDYMsX_mowZ9CRtbnrQ0NtW--IWLtfOk7-Xzz-Zjx4jofS7Cs4ATy58ZR2oSQ/exec"; 
+    // --- ตั้งค่าข้อมูลของคุณตรงนี้ ---
+    const LIFF_ID = "YOUR_LIFF_ID"; 
+    const SCRIPT_URL = "YOUR_APPS_SCRIPT_URL"; 
 
     async function main() {
-        await liff.init({ liffId: LIFF_ID });
-        if (!liff.isLoggedIn()) {
-            liff.login();
-        } else {
-            const profile = await liff.getProfile();
-            document.getElementById("userImg").src = profile.pictureUrl;
-            fetchHistory(profile.userId);
-        }
+        try {
+            await liff.init({ liffId: LIFF_ID });
+            if (!liff.isLoggedIn()) {
+                liff.login();
+            } else {
+                const profile = await liff.getProfile();
+                fetchUserData(profile.userId);
+            }
+        } catch (e) { console.error(e); }
     }
 
-    async function fetchHistory(userId) {
+    async function fetchUserData(userId) {
         try {
             const res = await fetch(`${SCRIPT_URL}?userId=${userId}`);
             const data = await res.json();
             if (data.status === "found") {
-                // โชว์ข้อมูลล่าสุดบนบัตร
                 document.getElementById("dispName").innerText = data.user.fullName;
-                document.getElementById("dispCompany").innerText = "บริษัท: " + data.user.company;
-                document.getElementById("dispPhone").innerText = "โทร: " + data.user.phone;
-                
-                // ใส่ค่าเดิมลงในฟอร์มให้อัตโนมัติ
+                document.getElementById("dispCompany").innerText = data.user.company || "-";
                 document.getElementById("fullName").value = data.user.fullName;
                 document.getElementById("company").value = data.user.company;
                 document.getElementById("phone").value = data.user.phone;
-
-                // แสดงประวัติ
                 renderHistory(data.history);
             }
-        } catch (e) { console.log("No history yet"); }
+        } catch (e) { }
     }
 
     function renderHistory(history) {
         const list = document.getElementById("historyList");
-        if (history.length === 0) return;
+        if (!history || history.length === 0) return;
         list.innerHTML = history.map(item => `
             <div class="history-item">
-                <div class="h-date">${item.date} | ${item.topic}</div>
-                <div class="h-note">โน้ต: ${item.note}</div>
+                <div class="h-date">${item.date}</div>
+                <div class="h-note">${item.note}</div>
             </div>
         `).join('');
     }
 
-    async function saveAllInOne() {
+    async function processRequest() {
         const name = document.getElementById("fullName").value;
         const comp = document.getElementById("company").value;
         const ph = document.getElementById("phone").value;
         const note = document.getElementById("userNote").value;
 
-        if (!name || !ph) return alert("กรุณากรอกชื่อและเบอร์โทรศัพท์");
+        if (!name || !ph || !note) return alert("Please fill in all fields.");
 
         document.getElementById("loading").style.display = "flex";
         const profile = await liff.getProfile();
@@ -142,28 +126,29 @@
             fullName: name,
             company: comp,
             phone: ph,
-            topic: "แจ้งข้อมูล/บริการ",
-            note: note || "ไม่มีโน้ต"
+            topic: "Service Request",
+            note: note
         };
 
         try {
-            // 1. ส่งข้อมูลไป Sheets
+            // 1. บันทึกลง Google Sheets
             await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
 
-            // 2. ส่งข้อความเข้า LINE
+            // 2. ส่งแจ้งเตือนเข้า LINE (แบบเรียบ)
             if (liff.isInClient()) {
+                const now = new Date();
+                const timestamp = `${now.toLocaleDateString('en-GB')} ${now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'})}`;
+                
                 await liff.sendMessages([{
                     "type": "text",
-                    "text": `✅ บันทึกข้อมูลสำเร็จ\n👤 ชื่อ: ${name}\n📝 โน้ต: ${note || '-'}`
+                    "text": `● SERVICE REQUEST\n—\nDetails\n${note}\n\nCustomer\n${name}\n${comp || '-'}\n${ph}\n—\n*${timestamp}*`
                 }]);
             }
 
-            alert("บันทึกข้อมูลเรียบร้อย!");
-            // 3. รีโหลดข้อมูลเพื่ออัปเดตหน้าบัตรและประวัติ
-            fetchHistory(profile.userId);
-            document.getElementById("userNote").value = ""; // ล้างช่องโน้ต
+            alert("Request successfully recorded.");
+            location.reload(); // รีโหลดเพื่ออัปเดตหน้าจอ
         } catch (e) {
-            alert("เกิดข้อผิดพลาดในการบันทึก");
+            alert("Connection error. Please try again.");
         } finally {
             document.getElementById("loading").style.display = "none";
         }
@@ -171,9 +156,5 @@
 
     main();
 </script>
-
-<style>
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-</style>
 </body>
 </html>
