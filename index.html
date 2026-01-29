@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,76 +16,81 @@
         .card-vip { 
             background: var(--main); color: #ffffff; 
             padding: 40px 25px; border-radius: 25px; box-shadow: 0 15px 30px rgba(0,0,0,0.3);
-            position: relative; margin-bottom: 30px; text-align: left;
+            position: relative; margin-bottom: 35px; text-align: left;
         }
-        .card-label { font-size: 1rem; letter-spacing: 2px; font-weight: 700; color: #ffffff; border-bottom: 2px solid #fff; display: inline-block; margin-bottom: 15px; }
-        .card-name { font-size: 2.2rem; font-weight: 700; margin: 10px 0; }
-        .card-comp { font-size: 1.2rem; opacity: 0.9; }
-        /* รูปโปรไฟล์ใหญ่ขึ้น */
-        #userImg { position: absolute; right: 20px; bottom: -15px; width: 100px; height: 100px; border-radius: 20px; border: 4px solid #fff; background: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .card-label { font-size: 1.1rem; letter-spacing: 2px; font-weight: 700; color: #ffffff; border-bottom: 2px solid #fff; display: inline-block; margin-bottom: 15px; }
+        .card-name { font-size: 2.2rem; font-weight: 700; margin: 10px 0 5px; text-transform: uppercase; }
+        .card-detail { font-size: 1.1rem; opacity: 0.9; margin-top: 5px; }
+        
+        /* รูปโปรไฟล์ใหญ่สะใจ */
+        #userImg { position: absolute; right: 20px; bottom: -20px; width: 110px; height: 110px; border-radius: 20px; border: 4px solid #fff; background: #fff; box-shadow: 0 8px 20px rgba(0,0,0,0.15); object-fit: cover; }
 
         /* Form - Bold & Large */
-        .section { background: white; border-radius: 20px; padding: 30px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        h3 { margin: 0 0 20px 0; font-size: 1.5rem; font-weight: 700; text-transform: uppercase; border-bottom: 4px solid var(--main); display: inline-block; }
+        .section { background: white; border-radius: 25px; padding: 30px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        h3 { margin: 0 0 20px 0; font-size: 1.6rem; font-weight: 700; text-transform: uppercase; border-left: 8px solid var(--main); padding-left: 15px; }
         
-        label { font-size: 1.1rem; font-weight: 700; margin-top: 15px; display: block; }
-        input, textarea { width: 100%; padding: 15px; margin-top: 8px; border: 2px solid #eee; border-radius: 12px; box-sizing: border-box; font-family: 'Kanit'; font-size: 1.2rem; }
+        label { font-size: 1.1rem; font-weight: 700; margin-top: 15px; display: block; text-transform: uppercase; }
+        input, textarea { width: 100%; padding: 16px; margin-top: 8px; border: 2px solid #eee; border-radius: 12px; box-sizing: border-box; font-family: 'Kanit'; font-size: 1.2rem; }
         input:focus { outline: none; border-color: var(--main); }
         
-        .btn-submit { width: 100%; padding: 20px; background: var(--main); color: white; border: none; border-radius: 15px; font-weight: 700; margin-top: 25px; cursor: pointer; font-size: 1.3rem; text-transform: uppercase; transition: 0.3s; }
-        .btn-submit:active { transform: scale(0.95); opacity: 0.8; }
+        .btn-submit { width: 100%; padding: 22px; background: var(--main); color: white; border: none; border-radius: 15px; font-weight: 700; margin-top: 30px; cursor: pointer; font-size: 1.4rem; text-transform: uppercase; transition: 0.3s; }
+        .btn-submit:active { transform: scale(0.96); opacity: 0.8; }
 
-        /* History List */
+        /* History */
         .h-item { border-bottom: 2px solid #f0f0f0; padding: 15px 0; }
-        .h-date { color: #999; font-size: 0.9rem; }
-        .h-topic { font-weight: 700; font-size: 1.2rem; margin: 5px 0; color: var(--main); }
+        .h-date { color: #999; font-size: 0.95rem; }
+        .h-topic { font-weight: 700; font-size: 1.3rem; margin: 5px 0; color: var(--main); }
         .h-note { color: #444; font-size: 1.1rem; }
 
-        .loading { position: fixed; inset: 0; background: rgba(255,255,255,0.95); display: none; align-items: center; justify-content: center; z-index: 1000; font-weight: 700; font-size: 1.5rem; }
+        .loading { position: fixed; inset: 0; background: rgba(255,255,255,0.95); display: none; align-items: center; justify-content: center; z-index: 1000; font-weight: 700; font-size: 1.6rem; }
     </style>
 </head>
 <body>
 
-<div id="loading" class="loading">SYNCING...</div>
+<div id="loading" class="loading">SYNCING DATA...</div>
 
 <div class="container">
     <div class="card-vip">
         <div class="card-label">THAI SINTO SERVICES</div>
         <div id="dispName" class="card-name">GUEST</div>
-        <div id="dispCompany" class="card-comp">Company: -</div>
-        <img id="userImg" src="https://via.placeholder.com/100">
+        <div id="dispCompany" class="card-detail">Company: -</div>
+        <div id="dispEmail" class="card-detail">Email: -</div>
+        <img id="userImg" src="https://via.placeholder.com/110">
     </div>
 
     <div class="section">
         <h3>Request / แจ้งบริการ</h3>
         
         <label>Subject / หัวข้อ</label>
-        <input type="text" id="subject" placeholder="What is it about?">
+        <input type="text" id="subject" placeholder="What can we help you?">
         
         <label>Full Name / ชื่อ-นามสกุล</label>
-        <input type="text" id="fullName" placeholder="Your name">
+        <input type="text" id="fullName" placeholder="Your full name">
         
         <label>Company / บริษัท</label>
         <input type="text" id="company" placeholder="Company name">
+
+        <label>Email / อีเมล</label>
+        <input type="email" id="email" placeholder="example@email.com">
         
         <label>Phone / เบอร์โทร</label>
         <input type="tel" id="phone" placeholder="0XXXXXXXXX" maxlength="10">
         
         <label>Details / รายละเอียด</label>
-        <textarea id="userNote" rows="3" placeholder="More information..."></textarea>
+        <textarea id="userNote" rows="3" placeholder="Explain your request..."></textarea>
         
         <button id="btnSave" class="btn-submit" onclick="saveData()">SUBMIT REQUEST</button>
     </div>
 
     <div class="section">
-        <h3>Logs / ประวัติ</h3>
+        <h3>Recent Activity / ประวัติ</h3>
         <div id="historyList"></div>
     </div>
 </div>
 
 <script>
     const LIFF_ID = "2008820291-s6WNZ5xr"; 
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwikdhjIoNK75iAKv9FnL1TC5vkm3zexN8OqB0oh_U_-FiHavOMV7tcTf_VJ7XoiZi15A/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRXPne2Q1Da2EXZvaDskBJ20gFTMJOq5KaGLe3in-XRZ3a-s2u6cecR4_I1x9xGcRcRQ/exec"; 
 
     async function main() {
         await liff.init({ liffId: LIFF_ID });
@@ -103,8 +109,11 @@
             if (data.status === "found") {
                 document.getElementById("dispName").innerText = data.user.fullName.toUpperCase();
                 document.getElementById("dispCompany").innerText = "Company: " + data.user.company;
+                document.getElementById("dispEmail").innerText = "Email: " + data.user.email;
+                
                 document.getElementById("fullName").value = data.user.fullName;
                 document.getElementById("company").value = data.user.company;
+                document.getElementById("email").value = data.user.email;
                 document.getElementById("phone").value = data.user.phone;
                 
                 document.getElementById("historyList").innerHTML = data.history.map(h => `
@@ -122,10 +131,11 @@
         const sub = document.getElementById("subject").value;
         const name = document.getElementById("fullName").value;
         const comp = document.getElementById("company").value;
+        const email = document.getElementById("email").value;
         const ph = document.getElementById("phone").value;
         const note = document.getElementById("userNote").value;
 
-        if (!sub || !name || !ph) return alert("REQUIRED FIELDS MISSING!");
+        if (!sub || !name || !email || !ph) return alert("REQUIRED FIELDS MISSING!");
 
         document.getElementById("loading").style.display = "flex";
         document.getElementById("btnSave").disabled = true;
@@ -133,7 +143,7 @@
         const profile = await liff.getProfile();
         const payload = {
             userId: profile.userId, lineName: profile.displayName,
-            fullName: name, company: comp || "-", phone: ph,
+            fullName: name, company: comp || "-", email: email, phone: ph,
             subject: sub, note: note
         };
 
@@ -144,12 +154,16 @@
                 const ts = new Date().toLocaleString('en-GB');
                 await liff.sendMessages([{
                     "type": "text",
-                    "text": `● NEW SERVICE REQUEST\n—\nSubject: ${sub}\nDetails: ${note || '-'}\n\nCustomer: ${name}\nCompany: ${comp || '-'}\nPhone: ${ph}\n—\n*${ts}*`
+                    "text": `● NEW SERVICE REQUEST\n—\nSubject: ${sub}\nDetails: ${note || '-'}\n\nCustomer: ${name}\nCompany: ${comp || '-'}\nEmail: ${email}\nPhone: ${ph}\n—\n*Recorded at ${ts}*`
                 }]);
             }
             alert("SUCCESSFULLY SUBMITTED!");
             location.reload();
-        } catch (e) { alert("ERROR! CHECK SCRIPT URL"); }
+        } catch (e) { alert("ERROR! CHECK CONNECTION"); }
+        finally {
+            document.getElementById("loading").style.display = "none";
+            document.getElementById("btnSave").disabled = false;
+        }
     }
     main();
 </script>
