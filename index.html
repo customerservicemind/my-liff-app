@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIP Member & Service Portal</title>
+    <title>Member & Service Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
@@ -18,13 +18,11 @@
         input, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-family: 'Kanit'; font-size: 0.95rem; }
         textarea { resize: none; background: #fcfcfc; }
         .btn-save { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: bold; margin-top: 20px; cursor: pointer; transition: 0.3s; }
-        .btn-save:active { background: var(--secondary); transform: scale(0.98); }
         
         .service-menu { padding: 0 25px 30px; }
         .service-title { font-size: 0.9rem; color: #888; margin: 20px 0 10px; border-top: 1px solid #eee; padding-top: 15px; text-align: center; }
         .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .btn-service { background: #fff; border: 1px solid #eee; padding: 15px 10px; border-radius: 15px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: 0.3s; font-family: 'Kanit'; font-size: 0.8rem; }
-        .btn-service:active { background: #f0f0f0; transform: scale(0.95); }
         .btn-full { grid-column: span 2; background-color: #e8f5e9; border: 1px solid #c8e6c9; }
         .icon { font-size: 1.4rem; }
 
@@ -44,7 +42,7 @@
     <div class="header">VIP MEMBER & SERVICE</div>
     <div class="profile">
         <img id="pictureUrl" src="">
-        <div id="displayName" style="font-weight:bold; color: #333;">กำลังโหลดโปรไฟล์...</div>
+        <div id="displayName" style="font-weight:bold; color: #333;">Loading...</div>
     </div>
 
     <div class="form-section">
@@ -62,7 +60,7 @@
 
     <div class="service-menu">
         <div class="service-title">แจ้งความประสงค์ (ระบุรายละเอียดในโน้ต)</div>
-        <textarea id="userNote" rows="3" placeholder="พิมพ์รายละเอียดที่นี่ เช่น แจ้งซ่อมจุดไหน, สินค้าตัวไหน..."></textarea>
+        <textarea id="userNote" rows="3" placeholder="พิมพ์รายละเอียด เช่น แจ้งซ่อมจุดไหน..."></textarea>
         
         <div class="btn-grid" style="margin-top:15px;">
             <button class="btn-service" onclick="handleService('สอบถามข้อมูลบริการ')">
@@ -81,7 +79,8 @@
 <script>
     // --- ตั้งค่าข้อมูลของคุณตรงนี้ ---
     const LIFF_ID = "2008820291-s6WNZ5xr"; 
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwuPjOlY7iwkz9xlRf0OTtwzL_-tU0X0ER_c-Z8FgNR4wjOO1_qGwOeF-VwklcKFry-Ew/exec"; // วาง URL ของคุณที่นี่
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwmG9VJb4gbYUVJeL9bDIZR8_AMuOI_eeZKzpdtJ-otUFSxBevThyxKHjUyy1YZZ_cW4A/exec
+"; 
 
     async function main() {
         try {
@@ -95,19 +94,15 @@
                     document.getElementById("pictureUrl").src = profile.pictureUrl;
                     document.getElementById("pictureUrl").style.display = "block";
                 }
-                
-                // ดึงอีเมลเริ่มต้น
                 const token = liff.getDecodedIDToken();
                 if (token && token.email) document.getElementById("email").value = token.email;
-
                 loadMemberData(profile.userId);
             }
         } catch (err) { console.error(err); }
     }
 
-    // ดึงข้อมูลเก่ามาโชว์
     async function loadMemberData(userId) {
-        toggleLoading(true, "กำลังดึงข้อมูลสมาชิก...");
+        toggleLoading(true, "กำลังโหลดข้อมูล...");
         try {
             const res = await fetch(`${SCRIPT_URL}?userId=${userId}`);
             const data = await res.json();
@@ -118,49 +113,46 @@
                 document.getElementById("phone").value = data.phone || "";
                 document.getElementById("mainBtn").innerText = "อัปเดตข้อมูลสมาชิก";
             }
-        } catch (e) { console.log("New User"); }
+        } catch (e) { }
         toggleLoading(false);
     }
 
-    // บันทึกข้อมูลสมาชิกปกติ
     async function saveMemberData() {
         const payload = getFields();
         if (!payload.fullName || payload.phone.length < 10) return alert("กรุณากรอกข้อมูลให้ครบถ้วน");
-
-        toggleLoading(true, "กำลังบันทึกข้อมูล...");
-        sendToSheet(payload, "บันทึกข้อมูลสมาชิกเรียบร้อย!");
+        toggleLoading(true, "กำลังบันทึก...");
+        
+        fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) })
+        .then(() => { alert("บันทึกข้อมูลสำเร็จ!"); toggleLoading(false); })
+        .catch(() => { alert("บันทึกไม่สำเร็จ"); toggleLoading(false); });
     }
 
-    // ส่งบริการพร้อมโน้ต
     async function handleService(topic) {
         const payload = getFields();
         payload.topic = topic;
         payload.note = document.getElementById("userNote").value;
 
-        if (!payload.fullName || !payload.phone) return alert("กรุณาลงทะเบียนสมาชิกก่อนแจ้งบริการครับ");
+        if (!payload.fullName || payload.phone.length < 10) return alert("กรุณาลงทะเบียนสมาชิกก่อนครับ");
         if (!payload.note) return alert("กรุณาพิมพ์รายละเอียดในช่องโน้ตก่อนครับ");
 
-        toggleLoading(true, "กำลังส่งรายการแจ้ง...");
+        toggleLoading(true, "กำลังส่งรายการ...");
         
         try {
-            // 1. ส่งลง Sheets
             await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
             
-            // 2. ส่งเข้าแชท LINE
             if (liff.isInClient()) {
                 await liff.sendMessages([{
                     "type": "text",
-                    "text": `📢 แจ้งบริการ: ${topic}\n📝 โน้ต: ${payload.note}\n👤 ชื่อ: ${payload.fullName}\n🏢 บริษัท: ${payload.company}`
+                    "text": `🔔 รายการแจ้งใหม่!\n📌 บริการ: ${topic}\n📝 โน้ต: ${payload.note}\n----------\n👤 ชื่อ: ${payload.fullName}\n🏢 บริษัท: ${payload.company || '-'}\n📞 โทร: ${payload.phone}`
                 }]);
             }
-            alert("ส่งข้อมูลสำเร็จ!");
+            alert("แจ้งบริการเรียบร้อย!");
             document.getElementById("userNote").value = "";
             liff.closeWindow();
         } catch (err) { alert("เกิดข้อผิดพลาด"); }
         toggleLoading(false);
     }
 
-    // Helper: ดึงค่าจากฟิลด์ต่างๆ
     function getFields() {
         return {
             userId: liff.getDecodedIDToken().sub,
@@ -170,19 +162,6 @@
             email: document.getElementById("email").value,
             phone: document.getElementById("phone").value
         };
-    }
-
-    // Helper: ส่งข้อมูลไป Google Sheets
-    function sendToSheet(payload, successMsg) {
-        fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) })
-        .then(() => {
-            alert(successMsg);
-            toggleLoading(false);
-        })
-        .catch(() => {
-            alert("บันทึกไม่สำเร็จ");
-            toggleLoading(false);
-        });
     }
 
     function toggleLoading(show, text = "") {
