@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,7 +9,7 @@
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
         :root { --main: #000000; --bg: #ffffff; --text: #000000; }
-        body { font-family: 'Kanit', sans-serif; background: #f0f0f0; margin: 0; padding: 15px; color: var(--text); }
+        body { font-family: 'Kanit', sans-serif; background: #f4f7f6; margin: 0; padding: 15px; color: var(--text); }
         .container { width: 100%; max-width: 420px; margin: 0 auto; }
         
         /* Premium Card - Metallic Silver */
@@ -25,39 +26,38 @@
         
         #userImg { position: absolute; right: 20px; bottom: -20px; width: 110px; height: 110px; border-radius: 20px; border: 4px solid #fff; background: #fff; box-shadow: 0 8px 20px rgba(0,0,0,0.15); object-fit: cover; }
 
-        /* Form */
+        /* Form Layout */
         .section { background: white; border-radius: 25px; padding: 30px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
         h3 { margin: 0 0 20px 0; font-size: 1.6rem; font-weight: 700; text-transform: uppercase; border-left: 8px solid var(--main); padding-left: 15px; color: #000; }
         
-        label { font-size: 1.1rem; font-weight: 700; margin-top: 15px; display: block; text-transform: uppercase; color: #000; }
+        label { font-size: 1rem; font-weight: 700; margin-top: 15px; display: block; text-transform: uppercase; color: #333; }
         
-        /* Input & Dropdown - Set text to Black */
+        /* Input & Dropdown Styling */
         input, textarea, select { 
             width: 100%; padding: 16px; margin-top: 8px; border: 2px solid #eee; border-radius: 12px; 
-            box-sizing: border-box; font-family: 'Kanit'; font-size: 1.1rem; background-color: white;
-            color: #000000 !important; /* Force Black Text */
-            appearance: none; -webkit-appearance: none; 
+            box-sizing: border-box; font-family: 'Kanit'; font-size: 1.1rem; background-color: #fff;
+            color: #000000 !important; transition: 0.3s;
         }
         
-        /* Dropdown specific */
+        /* Custom Dropdown Arrow */
         select { 
+            appearance: none; -webkit-appearance: none;
             background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
             background-repeat: no-repeat; background-position: right 15px top 50%; background-size: 12px auto;
-            padding-right: 40px;
+            padding-right: 40px; cursor: pointer;
         }
-        select option { color: #000; background: #fff; }
 
-        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--main); }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--main); background-color: #fff; }
         
         .btn-submit { width: 100%; padding: 22px; background: var(--main); color: white; border: none; border-radius: 15px; font-weight: 700; margin-top: 30px; cursor: pointer; font-size: 1.4rem; text-transform: uppercase; transition: 0.3s; }
         .btn-submit:active { transform: scale(0.96); opacity: 0.8; }
         .btn-submit:disabled { background: #999; }
 
-        /* History Items */
+        /* History List */
         .h-item { border-bottom: 2px solid #f0f0f0; padding: 15px 0; }
-        .h-date { color: #666; font-size: 0.95rem; }
-        .h-topic { font-weight: 700; font-size: 1.2rem; margin: 5px 0; color: #000; }
-        .h-note { color: #333; font-size: 1.1rem; }
+        .h-date { color: #888; font-size: 0.85rem; }
+        .h-topic { font-weight: 700; font-size: 1.1rem; margin: 5px 0; color: #000; }
+        .h-note { color: #555; font-size: 1rem; }
 
         .loading { position: fixed; inset: 0; background: rgba(255,255,255,0.95); display: none; align-items: center; justify-content: center; z-index: 1000; font-weight: 700; font-size: 1.6rem; color: #000; }
     </style>
@@ -83,7 +83,7 @@
             <option value="" disabled selected>-- เลือกหัวข้อบริการ --</option>
             <option value="Machine Inquiry">Machine Inquiry สนใจสอบถามข้อมูลเครื่องจักร</option>
             <option value="Preventive Maintenance (PM) Check">Preventive Maintenance (PM) Check สอบถามตรวจเช็คสภาพเครื่องจักร</option>
-            <option value="Maintenance Spare Parts Quotation">Maintenance Spare Parts Quotation สอบถามขอใบเสนอราคา</option>
+            <option value="Spare Parts Quotation">Spare Parts Quotation สอบถามขอใบเสนอราคา</option>
         </select>
         
         <label>Full Name / ชื่อ-นามสกุล</label>
@@ -106,13 +106,16 @@
 
     <div class="section">
         <h3>Recent Activity / ประวัติ</h3>
-        <div id="historyList"></div>
+        <div id="historyList">
+            <p style="color:#999; text-align:center;">No recent activity</p>
+        </div>
     </div>
 </div>
 
 <script>
+    // Configuration
     const LIFF_ID = "2009004913-zW1ZuaKw"; 
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwFLnnCSueBDrsuwyxHjjLDPPe5mDLGbJuAxZ-Y5AI7h42UUzXyQZF5jdd346wZEH_V/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxk_Ym-PFjCkAPZlDAyOIJNy3uuZpebfbBCY9WGz4lEgQWvqCyUPXQUttmwL5CDu9ag/exec"; 
 
     async function main() {
         try {
@@ -124,7 +127,7 @@
                 document.getElementById("userImg").src = profile.pictureUrl;
                 loadData(profile.userId);
             }
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error("LIFF Init Error:", e); }
     }
 
     async function loadData(userId) {
@@ -145,7 +148,7 @@
                     document.getElementById("historyList").innerHTML = data.history.map(h => `
                         <div class="h-item">
                             <div class="h-date">${h.date}</div>
-                            <div class="h-topic">${h.subject.toUpperCase()}</div>
+                            <div class="h-topic">${h.subject}</div>
                             <div class="h-note">${h.note || '-'}</div>
                         </div>
                     `).join('');
@@ -156,14 +159,16 @@
 
     async function saveData() {
         const sub = document.getElementById("subject").value;
-        const name = document.getElementById("fullName").value;
-        const comp = document.getElementById("company").value;
-        const email = document.getElementById("email").value;
-        const ph = document.getElementById("phone").value;
-        const note = document.getElementById("userNote").value;
+        const name = document.getElementById("fullName").value.trim();
+        const comp = document.getElementById("company").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const ph = document.getElementById("phone").value.trim();
+        const note = document.getElementById("userNote").value.trim();
 
+        // Validation
         if (!sub) return alert("กรุณาเลือก SUBJECT / หัวข้อ");
         if (!name || !email || !ph) return alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+        if (ph.length < 9) return alert("กรุณาตรวจสอบเบอร์โทรศัพท์");
 
         document.getElementById("loading").style.display = "flex";
         document.getElementById("btnSave").disabled = true;
@@ -181,15 +186,18 @@
                 note: note
             };
 
+            // Post to Google Sheets
             await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
 
+            // Send LINE Message
             if (liff.isInClient()) {
-                const ts = new Date().toLocaleString('en-GB');
+                const ts = new Date().toLocaleString('th-TH');
                 await liff.sendMessages([{
                     "type": "text",
                     "text": `● NEW SERVICE REQUEST\n—\nSubject: ${sub}\nDetails: ${note || '-'}\n\nCustomer: ${name}\nCompany: ${comp || '-'}\nEmail: ${email}\nPhone: ${ph}\n—\n*Recorded at ${ts}*`
                 }]);
             }
+
             alert("SUCCESSFULLY SUBMITTED!");
             location.reload();
         } catch (e) { 
