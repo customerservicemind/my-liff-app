@@ -11,7 +11,7 @@
         body { font-family: 'Kanit', sans-serif; background: #f0f0f0; margin: 0; padding: 15px; color: var(--text); }
         .container { width: 100%; max-width: 420px; margin: 0 auto; }
         
-        /* Premium Card */
+        /* Premium Card - Metallic Silver */
         .card-vip { 
             background: linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%); 
             color: #ffffff; 
@@ -27,35 +27,39 @@
 
         /* Form */
         .section { background: white; border-radius: 25px; padding: 30px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        h3 { margin: 0 0 20px 0; font-size: 1.6rem; font-weight: 700; text-transform: uppercase; border-left: 8px solid var(--main); padding-left: 15px; }
+        h3 { margin: 0 0 20px 0; font-size: 1.6rem; font-weight: 700; text-transform: uppercase; border-left: 8px solid var(--main); padding-left: 15px; color: #000; }
         
-        label { font-size: 1.1rem; font-weight: 700; margin-top: 15px; display: block; text-transform: uppercase; }
+        label { font-size: 1.1rem; font-weight: 700; margin-top: 15px; display: block; text-transform: uppercase; color: #000; }
+        
+        /* Input & Dropdown - Set text to Black */
         input, textarea, select { 
             width: 100%; padding: 16px; margin-top: 8px; border: 2px solid #eee; border-radius: 12px; 
             box-sizing: border-box; font-family: 'Kanit'; font-size: 1.1rem; background-color: white;
-            appearance: none; -webkit-appearance: none; /* ลบสไตล์ดั้งเดิมของมือถือ */
+            color: #000000 !important; /* Force Black Text */
+            appearance: none; -webkit-appearance: none; 
         }
         
-        /* สไตล์พิเศษสำหรับ Dropdown */
+        /* Dropdown specific */
         select { 
             background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
             background-repeat: no-repeat; background-position: right 15px top 50%; background-size: 12px auto;
             padding-right: 40px;
         }
+        select option { color: #000; background: #fff; }
 
         input:focus, select:focus, textarea:focus { outline: none; border-color: var(--main); }
         
         .btn-submit { width: 100%; padding: 22px; background: var(--main); color: white; border: none; border-radius: 15px; font-weight: 700; margin-top: 30px; cursor: pointer; font-size: 1.4rem; text-transform: uppercase; transition: 0.3s; }
         .btn-submit:active { transform: scale(0.96); opacity: 0.8; }
-        .btn-submit:disabled { background: #999; cursor: not-allowed; }
+        .btn-submit:disabled { background: #999; }
 
-        /* History */
+        /* History Items */
         .h-item { border-bottom: 2px solid #f0f0f0; padding: 15px 0; }
-        .h-date { color: #999; font-size: 0.95rem; }
-        .h-topic { font-weight: 700; font-size: 1.2rem; margin: 5px 0; color: var(--main); }
-        .h-note { color: #444; font-size: 1.1rem; }
+        .h-date { color: #666; font-size: 0.95rem; }
+        .h-topic { font-weight: 700; font-size: 1.2rem; margin: 5px 0; color: #000; }
+        .h-note { color: #333; font-size: 1.1rem; }
 
-        .loading { position: fixed; inset: 0; background: rgba(255,255,255,0.95); display: none; align-items: center; justify-content: center; z-index: 1000; font-weight: 700; font-size: 1.6rem; }
+        .loading { position: fixed; inset: 0; background: rgba(255,255,255,0.95); display: none; align-items: center; justify-content: center; z-index: 1000; font-weight: 700; font-size: 1.6rem; color: #000; }
     </style>
 </head>
 <body>
@@ -108,7 +112,7 @@
 
 <script>
     const LIFF_ID = "2009004913-zW1ZuaKw"; 
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzu-fRvVOCgMndbI35FVoNsBARLHAdZ879miJBpx--Bc4BG9LUsfGrELKaB8pzo1uaW/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwFLnnCSueBDrsuwyxHjjLDPPe5mDLGbJuAxZ-Y5AI7h42UUzXyQZF5jdd346wZEH_V/exec"; 
 
     async function main() {
         try {
@@ -137,15 +141,17 @@
                 document.getElementById("email").value = data.user.email;
                 document.getElementById("phone").value = data.user.phone;
                 
-                document.getElementById("historyList").innerHTML = data.history.map(h => `
-                    <div class="h-item">
-                        <div class="h-date">${h.date}</div>
-                        <div class="h-topic">${h.subject.toUpperCase()}</div>
-                        <div class="h-note">${h.note || '-'}</div>
-                    </div>
-                `).join('');
+                if (data.history && data.history.length > 0) {
+                    document.getElementById("historyList").innerHTML = data.history.map(h => `
+                        <div class="h-item">
+                            <div class="h-date">${h.date}</div>
+                            <div class="h-topic">${h.subject.toUpperCase()}</div>
+                            <div class="h-note">${h.note || '-'}</div>
+                        </div>
+                    `).join('');
+                }
             }
-        } catch (e) { }
+        } catch (e) { console.log("Data Load Error"); }
     }
 
     async function saveData() {
@@ -156,9 +162,8 @@
         const ph = document.getElementById("phone").value;
         const note = document.getElementById("userNote").value;
 
-        // การตรวจสอบข้อมูล
         if (!sub) return alert("กรุณาเลือก SUBJECT / หัวข้อ");
-        if (!name || !email || !ph) return alert("กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน");
+        if (!name || !email || !ph) return alert("กรุณากรอกข้อมูลให้ครบถ้วน");
 
         document.getElementById("loading").style.display = "flex";
         document.getElementById("btnSave").disabled = true;
@@ -188,7 +193,7 @@
             alert("SUCCESSFULLY SUBMITTED!");
             location.reload();
         } catch (e) { 
-            alert("Error: Cannot connect to server."); 
+            alert("Error: Connection Failed"); 
         } finally {
             document.getElementById("loading").style.display = "none";
             document.getElementById("btnSave").disabled = false;
